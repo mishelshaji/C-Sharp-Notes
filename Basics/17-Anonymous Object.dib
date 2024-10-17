@@ -1,0 +1,18 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":["c#","cs"],"languageName":"C#","name":"csharp"},{"aliases":["f#","fs"],"languageName":"F#","name":"fsharp"},{"aliases":[],"languageName":"HTML","name":"html"},{"aliases":[],"languageName":"http","name":"httpRequest"},{"aliases":["js"],"languageName":"JavaScript","name":"javascript"},{"aliases":[],"languageName":"KQL","name":"kql"},{"aliases":[],"languageName":"Mermaid","name":"mermaid"},{"aliases":["powershell"],"languageName":"PowerShell","name":"pwsh"},{"aliases":[],"languageName":"SQL","name":"sql"},{"aliases":[],"name":"value"}]}}
+
+#!markdown
+
+# Anonymous Objects
+
+In C#, an anonymous object is an object that is created without a class definition. Anonymous objects are useful when you want to create an object that contains only a few properties and you don't want to create a separate class for it. Anonymous objects are also useful when you want to pass a few properties to a method.
+
+#!csharp
+
+var obj = new {
+    name = "John Doe",
+    email = "johndoe@mail.com"
+};
+
+Console.WriteLine(obj.name);

@@ -1,0 +1,97 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":["c#","cs"],"languageName":"C#","name":"csharp"},{"aliases":["f#","fs"],"languageName":"F#","name":"fsharp"},{"aliases":[],"languageName":"HTML","name":"html"},{"aliases":[],"languageName":"http","name":"httpRequest"},{"aliases":["js"],"languageName":"JavaScript","name":"javascript"},{"aliases":[],"languageName":"KQL","name":"kql"},{"aliases":[],"languageName":"Mermaid","name":"mermaid"},{"aliases":["powershell"],"languageName":"PowerShell","name":"pwsh"},{"aliases":[],"languageName":"SQL","name":"sql"},{"aliases":[],"name":"value"}]}}
+
+#!markdown
+
+# Console Class
+
+The console class in C# is 
+
+#!markdown
+
+## Console.Write()
+
+This method writes text to the console. It does not create a new line.
+
+#!csharp
+
+Console.Write("Hello");
+Console.Write("Hello");
+
+#!markdown
+
+## Console.WriteLine()
+
+This method writes line of text to the console. It creates a new line.
+
+#!csharp
+
+Console.WriteLine("Hello");
+Console.WriteLine("Hello");
+
+#!csharp
+
+Console.Write('H');
+
+#!csharp
+
+Console.WriteLine(500);
+
+string message = "This is a message";
+Console.WriteLine(message);
+
+#!markdown
+
+## Displaying variables
+
+#!csharp
+
+string message = "This is a message";
+Console.WriteLine(message);
+
+#!markdown
+
+## Console Foreground Color
+
+#!csharp
+
+Console.ForegroundColor = ConsoleColor.Green;
+Console.WriteLine("Hello World");
+
+// Try this is a real console
+
+#!markdown
+
+## Console Background Color
+
+#!csharp
+
+Console.BackgroundColor = ConsoleColor.Green;
+Console.WriteLine("Hello World");
+
+// Try this is a real console
+
+#!markdown
+
+## Other console class options
+
+__Some of these options may not work in VS Code console. Please run this code in Visual Studio.__
+
+#!csharp
+
+// Makes a beep sound.
+Console.Beep();
+
+// Clears the console. Might cause an error in VS Code.
+Console.Clear();
+
+// This property returns true if the caps lock is on, otherwise false.
+Console.WriteLine(Console.CapsLock);
+
+// Gets or sets the visibility of the cursor.
+Console.WriteLine(Console.CursorVisible);
+Console.CursorVisible = false;
+
+// Gets a value indicating the the NUM Lock is on or off.
+Console.WriteLine(Console.NumberLock);

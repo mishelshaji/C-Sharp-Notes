@@ -1,0 +1,27 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":[],"languageName":"csharp","name":"csharp"}]}}
+
+#!markdown
+
+# Readonly properties
+
+Readonly properties are like regular properties / fields. But the only difference is that these property values can be changed only from the constructor of the class. A property can be marked as read-only using the `readonly` keyword.
+
+#!csharp
+
+class Person{
+    public string Name {get; set;}
+    public readonly DateTime CreatedAt;
+
+    public Person(){
+        // We can update the readonly field from the constructor.
+        CreatedAt = DateTime.Now; // ✅ OK
+    }
+}
+
+var p = new Person(){Name = "John"};
+// var p = new Person(){Name = "John", CreatedAt = DateTime.Now}; // ❌ Cannot assign a value to a readonly field.
+// p.CreatedAt = DateTime.Now; // ❌ Cannot assign a value to a readonly field.
+Console.WriteLine(p.Name);
+Console.WriteLine(p.CreatedAt);

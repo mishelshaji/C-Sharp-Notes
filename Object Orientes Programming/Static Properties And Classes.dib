@@ -1,0 +1,53 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":[],"languageName":"csharp","name":"csharp"}]}}
+
+#!markdown
+
+# Static properties
+
+In C#, a static property belongs to the class itself rather than to any instance of the class. This means:
+
+- It can be accessed directly using the class name, without needing to create an object of the class.
+- It is shared by all instances of the class.
+- Only one copy of a static property exists, regardless of how many objects are created. (created only once in the memory).
+
+Static properties are useful when you want to store values or functionality that should be common across all instances of a class.
+
+#!csharp
+
+class Circle
+{
+    // Static field to hold the value of Pi
+    private static double _pi = 3.14159;
+
+    public double Radius { get; set; }
+
+    // Method to calculate area using the static property Pi
+    public double CalculateArea()
+    {
+        return _pi * Radius * Radius;
+    }
+}
+
+var c1 = new Circle() {Radius = 5};
+Console.WriteLine(c1.CalculateArea());
+
+#!markdown
+
+Here is another example of static properties.
+
+#!csharp
+
+class AppSettings{
+    public static string Name { get; set; } = "MyApp";
+    public static string Version { get; set; } = "1.0.0";
+}
+
+// Static members are access through the class, not an instance.
+Console.WriteLine(AppSettings.Name); // ✅
+Console.WriteLine(AppSettings.Version); // ✅
+
+// The following is incorrect.
+// var settings = new AppSettings();
+// Console.WriteLine(settings.Name); // ❌ Static members cannot be accessed through an instance.

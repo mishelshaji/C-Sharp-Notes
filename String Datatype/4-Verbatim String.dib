@@ -1,0 +1,75 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":["c#","cs"],"languageName":"C#","name":"csharp"},{"aliases":["f#","fs"],"languageName":"F#","name":"fsharp"},{"aliases":[],"languageName":"HTML","name":"html"},{"aliases":[],"languageName":"http","name":"httpRequest"},{"aliases":["js"],"languageName":"JavaScript","name":"javascript"},{"aliases":[],"languageName":"KQL","name":"kql"},{"aliases":[],"languageName":"Mermaid","name":"mermaid"},{"aliases":["powershell"],"languageName":"PowerShell","name":"pwsh"},{"aliases":[],"languageName":"SQL","name":"sql"},{"aliases":[],"name":"value"}]}}
+
+#!markdown
+
+# Varbatim String
+
+In C#, a verbatim string is created using a special symbol @. The @ symbol tells the string constructor to ignore escape characters and line breaks. To use a verbatim string, just prepend a @ before the starting quotes.
+
+#!markdown
+
+This is useful in representing path. Assume that we have to save the location of a file to a string. The path is D:\Pictures\img.jpg.
+
+#!markdown
+
+The following code will not work as it contains \ in the string. Whenever we use a \ symbol, the next char is assumed to be a escape sequence line \n or \t.
+
+In this example, we have \P and \i. These are not escape sequences. So it throws an error.
+
+#!csharp
+
+string path = "D:\Pictures\img.jpg"; // Error
+
+#!markdown
+
+This is an example without using verbatim string.
+
+#!csharp
+
+string path = "D:\\Pictures\\img.jpg";
+Console.WriteLine(path);
+
+#!markdown
+
+Using verbatim string, we can easily represent the path. This will make the code more readable.
+
+#!csharp
+
+string path = @"D:\Pictures\img.jpg";
+Console.WriteLine(path);
+
+#!markdown
+
+## Multi-Line strings
+
+A verbatim string can also be used to store multi-line strings. Here's an example. Assume that you have to store the following lines of text.
+
+```
+Once there was an elephant,
+Who tried to use the telephant—
+No! No! I mean an elephone
+Who tried to use the telephone—
+```
+
+Without a verbatim string, the code is:
+
+#!csharp
+
+string data = "Once there was an elephant,\nWho tried to use the telephant—\nNo! No! I mean an elephone\nWho tried to use the telephone—";
+Console.WriteLine(data);
+
+#!markdown
+
+With verbatim string, the same code can be written as:
+
+#!csharp
+
+string data = @"
+Once there was an elephant,
+Who tried to use the telephant—
+No! No! I mean an elephone
+Who tried to use the telephone—
+";
+Console.WriteLine(data);

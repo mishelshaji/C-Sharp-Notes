@@ -1,0 +1,40 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":["c#","cs"],"languageName":"C#","name":"csharp"},{"aliases":["f#","fs"],"languageName":"F#","name":"fsharp"},{"aliases":[],"languageName":"HTML","name":"html"},{"aliases":[],"languageName":"http","name":"httpRequest"},{"aliases":["js"],"languageName":"JavaScript","name":"javascript"},{"aliases":[],"languageName":"KQL","name":"kql"},{"aliases":[],"languageName":"Mermaid","name":"mermaid"},{"aliases":["powershell"],"languageName":"PowerShell","name":"pwsh"},{"aliases":[],"languageName":"SQL","name":"sql"},{"aliases":[],"name":"value"}]}}
+
+#!markdown
+
+# String Builder Class
+
+The String Builder class is a class that allows you to build a string by appending characters to it. It is useful when you want to build a string from a loop or a function.
+
+#!csharp
+
+var sb = new StringBuilder();
+sb.AppendLine("Hello");
+sb.Append("World");
+sb.Append("!");
+sb.AppendFormat("The number is {0}", 42);
+
+string text = sb.ToString();
+Console.WriteLine(text);
+
+#!markdown
+
+Here's another example.
+
+#!csharp
+
+string[] names = { "John", "Paul", "George", "Ringo" };
+
+var sb = new StringBuilder();
+foreach (string name in names)
+{
+    sb.Append(name);
+    sb.Append(" ");
+}
+sb.AppendLine();
+sb.Append("Are friends");
+
+string text = sb.ToString();
+Console.WriteLine(text);
