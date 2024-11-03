@@ -1,0 +1,253 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":[],"name":"csharp"}]}}
+
+#!markdown
+
+# Static Readonly Fields and Constants in C#
+This guide explains the differences between static readonly fields and constants, when to use each, and best practices.
+
+## 1. Constants (const)
+Constants are immutable values known at compile time.
+
+#!csharp
+
+public class MathConstants
+{
+    // Constants must be initialized at declaration
+    public const double PI = 3.14159265359;
+    public const int DAYS_IN_WEEK = 7;
+    public const string APP_NAME = "MyApplication";
+    
+    // You can also have private constants
+    private const string CONNECTION_STRING = "server=localhost;database=mydb";
+}
+
+// Using constants
+Console.WriteLine($"PI: {MathConstants.PI}");
+Console.WriteLine($"Days in a week: {MathConstants.DAYS_IN_WEEK}");
+
+#!markdown
+
+### Characteristics of Constants:
+1. Must be initialized at declaration
+2. Value must be known at compile time
+3. Only primitive types, enum types, and string type can be constants
+4. Are implicitly static
+5. Cannot be changed after compilation
+
+### When to Use Constants:
+- Mathematical constants (π, e, etc.)
+- Configuration values that never change
+- Magic numbers that have specific meaning
+- Values that are truly constant across all possible scenarios
+
+#!markdown
+
+## 2. Static Readonly Fields
+Static readonly fields are immutable values that can be set either at declaration or in a static constructor.
+
+#!csharp
+
+public class ApplicationSettings
+{
+    // Static readonly fields initialized at declaration
+    public static readonly string AppVersion = "1.0.0";
+    public static readonly DateTime AppStartTime = DateTime.Now;
+    
+    // Static readonly fields can be initialized in static constructor
+    public static readonly List<string> SupportedLanguages;
+    
+    // Static constructor
+    static ApplicationSettings()
+    {
+        SupportedLanguages = new List<string>
+        {
+            "English",
+            "Spanish",
+            "French"
+        };
+    }
+}
+
+// Using static readonly fields
+Console.WriteLine($"App Version: {ApplicationSettings.AppVersion}");
+Console.WriteLine($"App Start Time: {ApplicationSettings.AppStartTime}");
+Console.WriteLine("Supported Languages: " + string.Join(", ", ApplicationSettings.SupportedLanguages));
+
+#!markdown
+
+### Characteristics of Static Readonly Fields:
+1. Can be initialized at declaration or in static constructor
+2. Value is set at runtime
+3. Can be of any type
+4. Cannot be changed after initialization
+5. Each type can have only one static constructor
+
+#!markdown
+
+## 3. Practical Examples and Use Cases
+
+#!csharp
+
+using System.IO;
+
+public class ConfigurationExample
+{
+    // Constants for truly fixed values
+    public const string COMPANY_NAME = "Acme Corp";
+    public const int MAX_RETRY_ATTEMPTS = 3;
+    
+    // Static readonly for runtime values
+    public static readonly DateTime ServiceStartTime = DateTime.Now;
+    public static readonly string TempFolderPath;
+    public static readonly Dictionary<string, string> DefaultSettings;
+    
+    static ConfigurationExample()
+    {
+        // Complex initialization in static constructor
+        TempFolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "TempFolder");
+        
+        DefaultSettings = new Dictionary<string, string>
+        {
+            { "Theme", "Dark" },
+            { "Language", "English" },
+            { "AutoSave", "true" }
+        };
+    }
+}
+
+// Using the configuration
+Console.WriteLine($"Company: {ConfigurationExample.COMPANY_NAME}");
+Console.WriteLine($"Service Start Time: {ConfigurationExample.ServiceStartTime}");
+Console.WriteLine($"Temp Folder: {ConfigurationExample.TempFolderPath}");
+foreach(var setting in ConfigurationExample.DefaultSettings)
+{
+    Console.WriteLine($"Setting - {setting.Key}: {setting.Value}");
+}
+
+#!markdown
+
+## 4. Common Scenarios and Best Practices
+
+### Database Connection Example
+
+#!csharp
+
+public class DatabaseConfig
+{
+    // Connection string format is constant
+    private const string CONNECTION_STRING_FORMAT = 
+        "Server={0};Database={1};User Id={2};Password={3}";
+    
+    // Actual connection string is static readonly because it's constructed at runtime
+    public static readonly string ConnectionString;
+    
+    static DatabaseConfig()
+    {
+        // In real application, these might come from configuration files
+        string server = "localhost";
+        string database = "mydb";
+        string username = "user";
+        string password = "password";
+        
+        ConnectionString = string.Format(
+            CONNECTION_STRING_FORMAT,
+            server, database, username, password
+        );
+    }
+}
+
+Console.WriteLine($"Connection String: {DatabaseConfig.ConnectionString}");
+
+#!markdown
+
+### API Configuration Example
+
+#!csharp
+
+public class ApiConfig
+{
+    // Constants for API endpoints
+    public const string API_VERSION = "v1";
+    public const string BASE_PATH = "/api/" + API_VERSION;
+    
+    // Static readonly for constructed URLs and runtime configurations
+    public static readonly Uri BaseUri;
+    public static readonly Dictionary<string, string> DefaultHeaders;
+    
+    static ApiConfig()
+    {
+        // Initialize runtime values
+        BaseUri = new Uri("https://api.example.com" + BASE_PATH);
+        DefaultHeaders = new Dictionary<string, string>
+        {
+            { "Content-Type", "application/json" },
+            { "Accept", "application/json" },
+            { "User-Agent", "MyApp/" + API_VERSION }
+        };
+    }
+}
+
+Console.WriteLine($"API Base URL: {ApiConfig.BaseUri}");
+Console.WriteLine("Default Headers:");
+foreach(var header in ApiConfig.DefaultHeaders)
+{
+    Console.WriteLine($"  {header.Key}: {header.Value}");
+}
+
+#!markdown
+
+## 5. Best Practices and Guidelines
+
+1. **Choose the Right Type:**
+   - Use `const` for values that are truly constant and known at compile time
+   - Use `static readonly` for values that need to be calculated or loaded at runtime
+
+2. **Naming Conventions:**
+   - Constants are typically named in UPPER_CASE
+   - Static readonly fields typically use PascalCase
+   - Be descriptive with names
+
+3. **Organization:**
+   - Group related constants and static readonly fields in dedicated classes
+   - Consider using partial classes for large configurations
+   - Use regions if you have many fields
+
+4. **Security:**
+   - Don't store sensitive information in constants (they're compiled into assemblies)
+   - Use static readonly for sensitive data loaded at runtime
+
+5. **Performance:**
+   - Constants are slightly more performant than static readonly fields
+   - Constants are replaced at compile time
+   - Static readonly fields require runtime initialization
+
+#!markdown
+
+## 6. Common Mistakes to Avoid
+
+1. **Modifying Collections:**
+```csharp
+public static readonly List Items = new List();
+// While Items reference can't change, the collection contents can be modified!
+// Consider using IReadOnlyList or similar immutable collections
+```
+
+2. **Complex Types as Constants:**
+```csharp
+// This won't compile!
+public const DateTime NOW = DateTime.Now;  // Error!
+// Use static readonly instead
+public static readonly DateTime StartupTime = DateTime.Now;
+```
+
+3. **Circular Dependencies:**
+```csharp
+public class Config
+{
+    // This can cause initialization problems!
+    public static readonly string Value1 = Helper.GetValue();
+    public static readonly string Value2 = Value1 + "suffix";
+}
+```

@@ -1,0 +1,193 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":[],"name":"csharp"}]}}
+
+#!markdown
+
+# C# Indexers - A Beginner's Guide
+
+Indexers in C# allow objects to be accessed like arrays using the `[]` notation. They provide a way to index into an object just like you would with an array, making the object's internal collection accessible in a more intuitive way.
+
+## Basic Syntax of an Indexer
+
+```csharp
+public type this[parameter_type index]
+{
+    get { /* return the value */ }
+    set { /* set the value */ }
+}
+```
+
+#!markdown
+
+## 1. Simple Indexer Example
+
+Let's start with a basic example of a class that uses an indexer to access an internal array:
+
+#!csharp
+
+public class NumberCollection
+{
+    private int[] numbers = new int[10];
+
+    // Indexer declaration
+    public int this[int index]
+    {
+        get 
+        { 
+            // Check if index is valid
+            if (index < 0 || index >= numbers.Length)
+            {
+                throw new IndexOutOfRangeException("Index is out of range");
+            }
+            return numbers[index];
+        }
+        set
+        {
+            if (index < 0 || index >= numbers.Length)
+            {
+                throw new IndexOutOfRangeException("Index is out of range");
+            }
+            numbers[index] = value;
+        }
+    }
+}
+
+// Let's try using our NumberCollection
+var collection = new NumberCollection();
+collection[0] = 100;  // Set value
+Console.WriteLine($"Value at index 0: {collection[0]}");  // Get value
+
+#!markdown
+
+## 2. String-Based Indexer Example
+
+Indexers can use different types as indexes, not just integers. Here's an example using strings as indexes:
+
+#!csharp
+
+public class StudentGrades
+{
+    private Dictionary<string, int> grades = new Dictionary<string, int>();
+
+    // String-based indexer
+    public int this[string studentName]
+    {
+        get
+        {
+            return grades.ContainsKey(studentName) ? grades[studentName] : -1;
+        }
+        set
+        {
+            if (grades.ContainsKey(studentName))
+            {
+                grades[studentName] = value;
+            }
+            else
+            {
+                grades.Add(studentName, value);
+            }
+        }
+    }
+}
+
+// Using the string-based indexer
+var gradeBook = new StudentGrades();
+gradeBook["John"] = 95;
+gradeBook["Alice"] = 88;
+Console.WriteLine($"John's grade: {gradeBook["John"]}");
+Console.WriteLine($"Alice's grade: {gradeBook["Alice"]}");
+
+#!markdown
+
+## 3. Multi-Dimensional Indexer Example
+
+Indexers can also take multiple parameters, creating a multi-dimensional indexer:
+
+#!csharp
+
+public class Matrix
+{
+    private int[,] data = new int[3, 3];
+
+    // Two-dimensional indexer
+    public int this[int row, int col]
+    {
+        get
+        {
+            if (row < 0 || row >= 3 || col < 0 || col >= 3)
+            {
+                throw new IndexOutOfRangeException("Index out of range");
+            }
+            return data[row, col];
+        }
+        set
+        {
+            if (row < 0 || row >= 3 || col < 0 || col >= 3)
+            {
+                throw new IndexOutOfRangeException("Index out of range");
+            }
+            data[row, col] = value;
+        }
+    }
+}
+
+// Using the multi-dimensional indexer
+var matrix = new Matrix();
+matrix[0, 0] = 1;
+matrix[0, 1] = 2;
+matrix[1, 0] = 3;
+Console.WriteLine($"Value at [0,0]: {matrix[0, 0]}");
+Console.WriteLine($"Value at [0,1]: {matrix[0, 1]}");
+Console.WriteLine($"Value at [1,0]: {matrix[1, 0]}");
+
+#!markdown
+
+## 4. Read-Only Indexer Example
+
+You can create read-only indexers by only implementing the get accessor:
+
+#!csharp
+
+public class ReadOnlyNumbers
+{
+    private int[] numbers = { 1, 2, 3, 4, 5 };
+
+    // Read-only indexer
+    public int this[int index]
+    {
+        get
+        {
+            if (index < 0 || index >= numbers.Length)
+            {
+                throw new IndexOutOfRangeException("Index is out of range");
+            }
+            return numbers[index];
+        }
+    }
+}
+
+// Using the read-only indexer
+var readOnlyNums = new ReadOnlyNumbers();
+Console.WriteLine($"Value at index 2: {readOnlyNums[2]}");
+// The following line would cause a compilation error:
+// readOnlyNums[2] = 10;  // Error: Property or indexer cannot be assigned to -- it is read-only
+
+#!markdown
+
+## Key Points to Remember:
+
+1. Indexers use the `this` keyword followed by square brackets `[]`
+2. They can have different parameter types (int, string, etc.)
+3. They can be multi-dimensional
+4. They can be read-only by implementing only the get accessor
+5. They should include proper validation to prevent index out of range errors
+6. They make objects feel more like native arrays or collections
+
+## Common Use Cases:
+
+1. Wrapping internal collections
+2. Creating custom collection classes
+3. Providing array-like access to object properties
+4. Implementing lookup functionality
+5. Creating mathematical structures (matrices, vectors)

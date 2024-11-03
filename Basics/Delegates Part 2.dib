@@ -1,0 +1,317 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":[],"name":"csharp"}]}}
+
+#!markdown
+
+# Delegates, Func, Action, Predicate, and Events in C#
+
+This guide covers the various ways to work with delegates in C#, including built-in delegate types and events.
+
+## 1. Basic Delegates
+Delegates are type-safe function pointers in C#. They allow methods to be passed as parameters.
+
+#!csharp
+
+// Define a delegate type
+public delegate int MathOperation(int x, int y);
+
+public class Calculator
+{
+    // Methods that match the delegate signature
+    public static int Add(int x, int y) => x + y;
+    public static int Subtract(int x, int y) => x - y;
+    public static int Multiply(int x, int y) => x * y;
+    
+    // Method that takes a delegate as parameter
+    public static void PerformOperation(int a, int b, MathOperation operation)
+    {
+        int result = operation(a, b);
+        Console.WriteLine($"Result: {result}");
+    }
+}
+
+// Using the delegate
+MathOperation addOperation = Calculator.Add;
+MathOperation subtractOperation = Calculator.Subtract;
+
+Calculator.PerformOperation(10, 5, addOperation);      // Result: 15
+Calculator.PerformOperation(10, 5, subtractOperation); // Result: 5
+Calculator.PerformOperation(10, 5, Calculator.Multiply); // Result: 50
+
+#!markdown
+
+## 2. Func Delegate
+Func is a built-in delegate type that encapsulates a method that returns a value.
+
+#!csharp
+
+// Func examples with different number of parameters
+Func<int> getRandomNumber = () => Random.Shared.Next(1, 100);
+Func<int, int> square = x => x * x;
+Func<int, int, int> add = (x, y) => x + y;
+Func<string, bool> isLongString = s => s.Length > 10;
+
+// Using Func delegates
+Console.WriteLine($"Random number: {getRandomNumber()}");
+Console.WriteLine($"Square of 5: {square(5)}");
+Console.WriteLine($"5 + 3 = {add(5, 3)}");
+Console.WriteLine($"Is 'Hello World' long? {isLongString("Hello World")}");
+
+// Real-world example: List transformation
+List<int> numbers = new List<int> { 1, 2, 3, 4, 5 };
+Func<int, string> numberToString = n => $"Number: {n}";
+var stringNumbers = numbers.Select(numberToString).ToList();
+
+foreach(var str in stringNumbers)
+{
+    Console.WriteLine(str);
+}
+
+#!markdown
+
+## 3. Action Delegate
+Action is a built-in delegate type that encapsulates a method that doesn't return a value (void).
+
+#!csharp
+
+// Action examples
+Action sayHello = () => Console.WriteLine("Hello!");
+Action<string> greet = name => Console.WriteLine($"Hello, {name}!");
+Action<string, int> repeatMessage = (msg, times) => 
+{
+    for(int i = 0; i < times; i++)
+        Console.WriteLine(msg);
+};
+
+// Using Action delegates
+sayHello();
+greet("Alice");
+repeatMessage("Hello World", 3);
+
+// Real-world example: Processing a list
+List<string> names = new List<string> { "Alice", "Bob", "Charlie" };
+Action<string> printInUpperCase = s => Console.WriteLine(s.ToUpper());
+names.ForEach(printInUpperCase);
+
+#!markdown
+
+## 4. Predicate Delegate
+Predicate is a built-in delegate type that represents a method that takes one parameter and returns a boolean.
+
+#!csharp
+
+// Predicate examples
+Predicate<int> isEven = number => number % 2 == 0;
+Predicate<string> containsVowel = str => "aeiou".Any(vowel => str.Contains(vowel));
+
+// Using Predicate delegates
+Console.WriteLine($"Is 4 even? {isEven(4)}");
+Console.WriteLine($"Does 'hello' contain vowels? {containsVowel("hello")}");
+
+// Real-world example: Filtering a list
+List<int> numbers = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+Predicate<int> isGreaterThanFive = n => n > 5;
+var filteredNumbers = numbers.FindAll(isGreaterThanFive);
+
+Console.WriteLine("Numbers greater than 5: " + string.Join(", ", filteredNumbers));
+
+#!markdown
+
+## 5. Events
+Events are a way to implement the Observer pattern using delegates.
+
+#!csharp
+
+// Define custom EventArgs
+public class OrderEventArgs : EventArgs
+{
+    public string OrderId { get; }
+    public decimal Amount { get; }
+
+    public OrderEventArgs(string orderId, decimal amount)
+    {
+        OrderId = orderId;
+        Amount = amount;
+    }
+}
+
+// Class that raises events
+public class OrderProcessor
+{
+    // Define the event using a delegate
+    public event EventHandler<OrderEventArgs> OrderProcessed;
+    public event EventHandler<OrderEventArgs> LargeOrderDetected;
+
+    // Method to raise the event
+    public void ProcessOrder(string orderId, decimal amount)
+    {
+        // Process the order...
+        Console.WriteLine($"Processing order {orderId}...");
+
+        // Raise the OrderProcessed event
+        OrderProcessed?.Invoke(this, new OrderEventArgs(orderId, amount));
+
+        // Check for large orders
+        if (amount > 1000)
+        {
+            LargeOrderDetected?.Invoke(this, new OrderEventArgs(orderId, amount));
+        }
+    }
+}
+
+// Create event handlers
+OrderProcessor processor = new OrderProcessor();
+
+// Subscribe to events
+processor.OrderProcessed += (sender, e) => 
+{
+    Console.WriteLine($"Order {e.OrderId} processed. Amount: ${e.Amount}");
+};
+
+processor.LargeOrderDetected += (sender, e) =>
+{
+    Console.WriteLine($"Large order detected! Order {e.OrderId} with amount ${e.Amount}");
+};
+
+// Process some orders
+processor.ProcessOrder("ORD001", 500);
+processor.ProcessOrder("ORD002", 1500);
+
+#!markdown
+
+## 6. Multicast Delegates
+Delegates can point to multiple methods using the += operator.
+
+#!csharp
+
+public class Logger
+{
+    public static void LogToConsole(string message)
+    {
+        Console.WriteLine($"Console: {message}");
+    }
+
+    public static void LogToFile(string message)
+    {
+        Console.WriteLine($"File: {message}");
+    }
+
+    public static void LogToDatabase(string message)
+    {
+        Console.WriteLine($"Database: {message}");
+    }
+}
+
+// Create a multicast delegate
+Action<string> loggers = Logger.LogToConsole;
+loggers += Logger.LogToFile;
+loggers += Logger.LogToDatabase;
+
+// This will call all three logging methods
+loggers("Hello World");
+
+// Remove a method from the delegate chain
+loggers -= Logger.LogToFile;
+
+// Now only console and database logging will occur
+loggers("Goodbye World");
+
+#!markdown
+
+## 7. Anonymous Methods and Lambda Expressions
+
+#!csharp
+
+// Different ways to create delegates
+public class DelegateExamples
+{
+    // Traditional delegate
+    public delegate void MessageDelegate(string message);
+
+    public static void ShowDelegateVariations()
+    {
+        // 1. Using named method
+        MessageDelegate d1 = PrintMessage;
+        
+        // 2. Using anonymous method
+        MessageDelegate d2 = delegate(string message)
+        {
+            Console.WriteLine($"Anonymous: {message}");
+        };
+        
+        // 3. Using lambda expression
+        MessageDelegate d3 = (message) => Console.WriteLine($"Lambda: {message}");
+
+        // Call all variations
+        d1("Hello");
+        d2("World");
+        d3("!");
+    }
+
+    private static void PrintMessage(string message)
+    {
+        Console.WriteLine($"Named Method: {message}");
+    }
+}
+
+DelegateExamples.ShowDelegateVariations();
+
+#!markdown
+
+## 8. Best Practices and Common Patterns
+
+1. **Event Pattern**
+```csharp
+public class BestPractices
+{
+    // Standard event pattern
+    public event EventHandler SimpleEvent;
+    
+    // Protected virtual method for raising the event
+    protected virtual void OnSimpleEvent()
+    {
+        SimpleEvent?.Invoke(this, EventArgs.Empty);
+    }
+}
+```
+
+2. **Delegate Safety**
+```csharp
+public class DelegateSafety
+{
+    private Action _logger;
+
+    public void AddLogger(Action logger)
+    {
+        // Null check when adding delegates
+        if (logger != null)
+        {
+            _logger += logger;
+        }
+    }
+
+    public void Log(string message)
+    {
+        // Null check when invoking delegates
+        _logger?.Invoke(message);
+    }
+}
+```
+
+3. **Async Event Handlers**
+```csharp
+public class AsyncEventExample
+{
+    public event EventHandler AsyncEvent;
+
+    protected virtual async Task OnAsyncEvent()
+    {
+        var handler = AsyncEvent;
+        if (handler != null)
+        {
+            await Task.Run(() => handler(this, EventArgs.Empty));
+        }
+    }
+}
+```
