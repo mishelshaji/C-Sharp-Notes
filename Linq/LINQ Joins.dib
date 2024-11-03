@@ -1,0 +1,257 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":[],"name":"csharp"}]}}
+
+#!markdown
+
+# LINQ Joins in C#
+This notebook covers different types of joins in LINQ:
+- Inner Join
+- Left (Outer) Join
+- Group Join
+- Cross Join
+
+## Sample Data Setup
+Let's create some sample data to demonstrate different join operations.
+
+#!csharp
+
+// Define classes for our example
+public class Department
+{
+    public int DepartmentId { get; set; }
+    public string Name { get; set; }
+}
+
+public class Employee
+{
+    public int EmployeeId { get; set; }
+    public string Name { get; set; }
+    public int DepartmentId { get; set; }
+    public decimal Salary { get; set; }
+}
+
+// Create sample data
+var departments = new List<Department>
+{
+    new Department { DepartmentId = 1, Name = "IT" },
+    new Department { DepartmentId = 2, Name = "HR" },
+    new Department { DepartmentId = 3, Name = "Finance" },
+    new Department { DepartmentId = 4, Name = "Marketing" }
+};
+
+var employees = new List<Employee>
+{
+    new Employee { EmployeeId = 1, Name = "John", DepartmentId = 1, Salary = 50000 },
+    new Employee { EmployeeId = 2, Name = "Jane", DepartmentId = 1, Salary = 60000 },
+    new Employee { EmployeeId = 3, Name = "Bob", DepartmentId = 2, Salary = 45000 },
+    new Employee { EmployeeId = 4, Name = "Alice", DepartmentId = 2, Salary = 55000 },
+    new Employee { EmployeeId = 5, Name = "Mike", DepartmentId = 3, Salary = 65000 },
+    new Employee { EmployeeId = 6, Name = "Sara", DepartmentId = 1, Salary = 40000 }
+};
+
+#!markdown
+
+## 1. Inner Join
+Inner join returns only the matching elements from both collections.
+
+### Method Syntax
+
+#!csharp
+
+// Inner Join using method syntax
+var innerJoinMethod = employees.Join(
+    departments,
+    emp => emp.DepartmentId,    // Key selector for employees
+    dept => dept.DepartmentId,  // Key selector for departments
+    (emp, dept) => new         // Result selector
+    {
+        EmployeeName = emp.Name,
+        DepartmentName = dept.Name,
+        Salary = emp.Salary
+    }
+);
+
+Console.WriteLine("Inner Join Results (Method Syntax):");
+foreach (var result in innerJoinMethod)
+{
+    Console.WriteLine($"Employee: {result.EmployeeName}, Department: {result.DepartmentName}, Salary: {result.Salary:C}");
+}
+
+#!markdown
+
+### Query Syntax
+
+#!csharp
+
+// Inner Join using query syntax
+var innerJoinQuery = 
+    from emp in employees
+    join dept in departments
+    on emp.DepartmentId equals dept.DepartmentId
+    select new
+    {
+        EmployeeName = emp.Name,
+        DepartmentName = dept.Name,
+        Salary = emp.Salary
+    };
+
+Console.WriteLine("\nInner Join Results (Query Syntax):");
+foreach (var result in innerJoinQuery)
+{
+    Console.WriteLine($"Employee: {result.EmployeeName}, Department: {result.DepartmentName}, Salary: {result.Salary:C}");
+}
+
+#!markdown
+
+## 2. Left (Outer) Join
+Left join returns all elements from the left collection and matching elements from the right collection.
+
+#!csharp
+
+// Left Join using method syntax with GroupJoin and SelectMany
+var leftJoin = employees.GroupJoin(
+    departments,
+    emp => emp.DepartmentId,
+    dept => dept.DepartmentId,
+    (emp, depts) => new { emp, depts })
+    .SelectMany(
+        x => x.depts.DefaultIfEmpty(),
+        (x, dept) => new
+        {
+            EmployeeName = x.emp.Name,
+            DepartmentName = dept?.Name ?? "No Department",
+            Salary = x.emp.Salary
+        }
+    );
+
+Console.WriteLine("\nLeft Join Results:");
+foreach (var result in leftJoin)
+{
+    Console.WriteLine($"Employee: {result.EmployeeName}, Department: {result.DepartmentName}, Salary: {result.Salary:C}");
+}
+
+#!markdown
+
+## 3. Group Join
+Group join combines elements from both collections into a hierarchical result.
+
+#!csharp
+
+// Group Join using method syntax
+var groupJoin = departments.GroupJoin(
+    employees,
+    dept => dept.DepartmentId,
+    emp => emp.DepartmentId,
+    (dept, emps) => new
+    {
+        DepartmentName = dept.Name,
+        Employees = emps.ToList()
+    }
+);
+
+Console.WriteLine("\nGroup Join Results:");
+foreach (var dept in groupJoin)
+{
+    Console.WriteLine($"\nDepartment: {dept.DepartmentName}");
+    Console.WriteLine("Employees:");
+    foreach (var emp in dept.Employees)
+    {
+        Console.WriteLine($"- {emp.Name} (Salary: {emp.Salary:C})");
+    }
+}
+
+#!markdown
+
+## 4. Cross Join
+Cross join creates a cartesian product of both collections.
+
+#!csharp
+
+// Cross Join using method syntax
+var crossJoin = 
+    from emp in employees
+    from dept in departments
+    select new
+    {
+        EmployeeName = emp.Name,
+        DepartmentName = dept.Name
+    };
+
+Console.WriteLine("\nCross Join Results (First 5 records):");
+foreach (var result in crossJoin.Take(5))
+{
+    Console.WriteLine($"Employee: {result.EmployeeName}, Department: {result.DepartmentName}");
+}
+
+#!markdown
+
+## Practice Exercises
+
+Try these exercises to reinforce your understanding of LINQ joins:
+
+1. Find all departments and the count of employees in each department
+2. List all employees with their department names, including those without departments
+3. Find the department with the highest average salary
+4. Create a report showing departments and their total salary expense
+
+#!csharp
+
+// Exercise 1: Department Employee Count
+var deptEmployeeCount = departments
+    .GroupJoin(
+        employees,
+        d => d.DepartmentId,
+        e => e.DepartmentId,
+        (dept, emps) => new
+        {
+            DepartmentName = dept.Name,
+            EmployeeCount = emps.Count()
+        }
+    );
+
+Console.WriteLine("\nDepartment Employee Count:");
+foreach (var dept in deptEmployeeCount)
+{
+    Console.WriteLine($"{dept.DepartmentName}: {dept.EmployeeCount} employees");
+}
+
+// Exercise 2: Department Salary Report
+var departmentSalaries = departments
+    .GroupJoin(
+        employees,
+        d => d.DepartmentId,
+        e => e.DepartmentId,
+        (dept, emps) => new
+        {
+            DepartmentName = dept.Name,
+            TotalSalary = emps.Sum(e => e.Salary),
+            AverageSalary = emps.Any() ? emps.Average(e => e.Salary) : 0
+        }
+    );
+
+Console.WriteLine("\nDepartment Salary Report:");
+foreach (var dept in departmentSalaries)
+{
+    Console.WriteLine($"{dept.DepartmentName}:");
+    Console.WriteLine($"  Total Salary: {dept.TotalSalary:C}");
+    Console.WriteLine($"  Average Salary: {dept.AverageSalary:C}");
+}
+
+#!markdown
+
+## Common Mistakes to Avoid
+1. Forgetting to handle null values in joins
+2. Not considering performance with large datasets
+3. Using cross joins unintentionally
+4. Not checking for empty collections in group joins
+
+#!markdown
+
+## Best Practices
+1. Always use meaningful names for join variables
+2. Consider using query syntax for complex joins (more readable)
+3. Use appropriate join type based on your requirements
+4. Handle null values appropriately
+5. Consider creating separate models for join results
+6. Use proper exception handling when working with joins

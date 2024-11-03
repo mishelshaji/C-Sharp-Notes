@@ -1,0 +1,220 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":[],"name":"csharp"}]}}
+
+#!markdown
+
+# LINQ Any() and All() Methods
+`Any()` and `All()` are LINQ methods used for checking conditions across collections. They return boolean values and are extremely useful for validation and filtering.
+
+## 1. The Any() Method
+`Any()` checks if:
+- The collection has any elements (when used without a condition)
+- Any element meets a specified condition (when used with a predicate)
+
+Let's see this in action:
+
+#!csharp
+
+// Create a sample list
+var numbers = new List<int> { 1, 2, 3, 4, 5 };
+
+// Check if collection has any elements
+bool hasAnyNumbers = numbers.Any();
+Console.WriteLine($"Does the list have any numbers? {hasAnyNumbers}");
+
+// Check if any number is greater than 3
+bool hasNumbersGreaterThan3 = numbers.Any(n => n > 3);
+Console.WriteLine($"Are there any numbers greater than 3? {hasNumbersGreaterThan3}");
+
+// Check if any number is greater than 10
+bool hasNumbersGreaterThan10 = numbers.Any(n => n > 10);
+Console.WriteLine($"Are there any numbers greater than 10? {hasNumbersGreaterThan10}");
+
+#!markdown
+
+### Real-World Example with Objects
+
+#!csharp
+
+public class Product
+{
+    public string Name { get; set; }
+    public decimal Price { get; set; }
+    public bool IsInStock { get; set; }
+}
+
+// Create sample product data
+var products = new List<Product>
+{
+    new Product { Name = "Laptop", Price = 1200.00m, IsInStock = true },
+    new Product { Name = "Mouse", Price = 25.99m, IsInStock = true },
+    new Product { Name = "Keyboard", Price = 85.50m, IsInStock = false },
+    new Product { Name = "Monitor", Price = 350.00m, IsInStock = true }
+};
+
+// Check if any products are out of stock
+bool hasOutOfStockProducts = products.Any(p => !p.IsInStock);
+Console.WriteLine($"Are any products out of stock? {hasOutOfStockProducts}");
+
+// Check if any products are expensive (over $1000)
+bool hasExpensiveProducts = products.Any(p => p.Price > 1000);
+Console.WriteLine($"Are any products expensive? {hasExpensiveProducts}");
+
+#!markdown
+
+## 2. The All() Method
+`All()` checks if:
+- All elements in a collection meet a specified condition
+
+Let's see some examples:
+
+#!csharp
+
+// Check if all numbers are positive
+bool allPositive = numbers.All(n => n > 0);
+Console.WriteLine($"Are all numbers positive? {allPositive}");
+
+// Check if all numbers are less than 3
+bool allLessThanThree = numbers.All(n => n < 3);
+Console.WriteLine($"Are all numbers less than 3? {allLessThanThree}");
+
+// Check if all numbers are even
+bool allEven = numbers.All(n => n % 2 == 0);
+Console.WriteLine($"Are all numbers even? {allEven}");
+
+#!markdown
+
+### Real-World Example with Objects
+
+#!csharp
+
+// Check if all products are in stock
+bool allInStock = products.All(p => p.IsInStock);
+Console.WriteLine($"Are all products in stock? {allInStock}");
+
+// Check if all products are under $500
+bool allUnder500 = products.All(p => p.Price < 500);
+Console.WriteLine($"Are all products under $500? {allUnder500}");
+
+#!markdown
+
+## 3. Combining Any() and All()
+Let's look at some more complex scenarios combining both methods:
+
+#!csharp
+
+public class Order
+{
+    public int OrderId { get; set; }
+    public List<OrderItem> Items { get; set; }
+}
+
+public class OrderItem
+{
+    public string ProductName { get; set; }
+    public decimal Price { get; set; }
+    public bool IsShipped { get; set; }
+}
+
+// Create sample orders
+var orders = new List<Order>
+{
+    new Order 
+    { 
+        OrderId = 1,
+        Items = new List<OrderItem>
+        {
+            new OrderItem { ProductName = "Laptop", Price = 1200.00m, IsShipped = true },
+            new OrderItem { ProductName = "Mouse", Price = 25.99m, IsShipped = true }
+        }
+    },
+    new Order 
+    { 
+        OrderId = 2,
+        Items = new List<OrderItem>
+        {
+            new OrderItem { ProductName = "Keyboard", Price = 85.50m, IsShipped = false },
+            new OrderItem { ProductName = "Monitor", Price = 350.00m, IsShipped = true }
+        }
+    }
+};
+
+// Find if any order has all items shipped
+bool anyOrderFullyShipped = orders.Any(o => o.Items.All(item => item.IsShipped));
+Console.WriteLine($"Is any order fully shipped? {anyOrderFullyShipped}");
+
+// Find if all orders have any expensive items (over $1000)
+bool allOrdersHaveExpensiveItems = orders.All(o => o.Items.Any(item => item.Price > 1000));
+Console.WriteLine($"Do all orders have expensive items? {allOrdersHaveExpensiveItems}");
+
+#!markdown
+
+## 4. Practice Exercises
+Try these exercises to reinforce your understanding:
+
+#!csharp
+
+// Exercise 1: Create a list of students with grades and check:
+public class Student
+{
+    public string Name { get; set; }
+    public List<int> Grades { get; set; }
+}
+
+var students = new List<Student>
+{
+    new Student { Name = "Alice", Grades = new List<int> { 85, 90, 88, 92 } },
+    new Student { Name = "Bob", Grades = new List<int> { 75, 82, 81, 78 } },
+    new Student { Name = "Charlie", Grades = new List<int> { 95, 92, 89, 94 } }
+};
+
+// 1. Are there any students with all grades above 85?
+bool anyStudentAllAbove85 = students.Any(s => s.Grades.All(g => g > 85));
+Console.WriteLine($"Are there any students with all grades above 85? {anyStudentAllAbove85}");
+
+// 2. Do all students have at least one grade above 90?
+bool allStudentsHaveOneAbove90 = students.All(s => s.Grades.Any(g => g > 90));
+Console.WriteLine($"Do all students have at least one grade above 90? {allStudentsHaveOneAbove90}");
+
+#!markdown
+
+## 5. Common Mistakes and Best Practices
+
+1. **Empty Collections**
+   - `Any()` returns `false` for empty collections
+   - `All()` returns `true` for empty collections (vacuous truth)
+
+#!csharp
+
+var emptyList = new List<int>();
+Console.WriteLine($"Empty list Any(): {emptyList.Any()}");
+Console.WriteLine($"Empty list All(x > 0): {emptyList.All(x => x > 0)}");
+
+#!markdown
+
+2. **Performance Considerations**
+   - `Any()` stops evaluating as soon as it finds a matching element
+   - `All()` stops evaluating as soon as it finds a non-matching element
+   - Use `Any()` instead of `Count() > 0` for better performance
+
+#!markdown
+
+3. **Null Checking**
+   - Always check for null collections before using Any() or All()
+   - Consider using the null conditional operator (?.)
+
+#!csharp
+
+List<int> nullList = null;
+bool isNullSafe = nullList?.Any() ?? false;
+Console.WriteLine($"Null-safe Any() check: {isNullSafe}");
+
+#!markdown
+
+## Summary
+- Use `Any()` when you need to check if at least one element meets a condition
+- Use `All()` when you need to verify that every element meets a condition
+- These methods can be combined for complex queries
+- Be careful with empty collections and null values
+- Consider performance implications when choosing between different LINQ methods

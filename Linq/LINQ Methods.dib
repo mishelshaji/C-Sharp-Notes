@@ -1,0 +1,180 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":[],"name":"csharp"}]}}
+
+#!markdown
+
+# LINQ (Language Integrated Query) in C#
+LINQ is a powerful feature in C# that allows you to query and manipulate data from different sources (arrays, lists, XML, databases) using a consistent syntax.
+
+## Why Use LINQ?
+- Makes data querying easier and more readable
+- Reduces code complexity
+- Provides consistent way to work with different data sources
+- Enables functional programming style
+
+#!markdown
+
+## Basic LINQ Methods
+
+Let's start with a simple list of numbers to understand basic LINQ operations:
+
+#!csharp
+
+List<int> numbers = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+Console.WriteLine("Original Numbers: " + string.Join(", ", numbers));
+
+#!markdown
+
+### 1. Where (Filtering)
+`Where` is used to filter elements based on a condition.
+
+#!csharp
+
+// Get even numbers
+var evenNumbers = numbers.Where(n => n % 2 == 0);
+Console.WriteLine("Even Numbers: " + string.Join(", ", evenNumbers));
+
+// Get numbers greater than 5
+var numbersGreaterThan5 = numbers.Where(n => n > 5);
+Console.WriteLine("Numbers > 5: " + string.Join(", ", numbersGreaterThan5));
+
+#!markdown
+
+### 2. Select (Projection)
+`Select` transforms each element into a new form.
+
+#!csharp
+
+// Multiply each number by 2
+var doubledNumbers = numbers.Select(n => n * 2);
+Console.WriteLine("Doubled Numbers: " + string.Join(", ", doubledNumbers));
+
+// Create new anonymous type
+var numberObjects = numbers.Select(n => new { Number = n, Square = n * n });
+foreach (var item in numberObjects)
+{
+    Console.WriteLine($"Number: {item.Number}, Square: {item.Square}");
+}
+
+#!markdown
+
+### 3. OrderBy and OrderByDescending (Sorting)
+Used to sort elements in ascending or descending order.
+
+#!csharp
+
+// Create a list of random numbers
+List<int> unsortedNumbers = new List<int> { 5, 2, 8, 1, 9, 3 };
+
+// Sort in ascending order
+var ascendingOrder = unsortedNumbers.OrderBy(n => n);
+Console.WriteLine("Ascending Order: " + string.Join(", ", ascendingOrder));
+
+// Sort in descending order
+var descendingOrder = unsortedNumbers.OrderByDescending(n => n);
+Console.WriteLine("Descending Order: " + string.Join(", ", descendingOrder));
+
+#!markdown
+
+### 4. First, Last, FirstOrDefault, LastOrDefault
+Methods to get single elements from a sequence.
+
+#!csharp
+
+// Get first and last elements
+Console.WriteLine($"First number: {numbers.First()}");
+Console.WriteLine($"Last number: {numbers.Last()}");
+
+// Using FirstOrDefault with empty list
+List<int> emptyList = new List<int>();
+int firstNumber = emptyList.FirstOrDefault(); // Returns 0 instead of throwing exception
+Console.WriteLine($"First number from empty list: {firstNumber}");
+
+#!markdown
+
+### 5. Working with Complex Objects
+Let's see how LINQ works with a list of custom objects.
+
+#!csharp
+
+public class Student
+{
+    public string Name { get; set; }
+    public int Age { get; set; }
+    public List<int> Grades { get; set; }
+}
+
+// Create a list of students
+var students = new List<Student>
+{
+    new Student { Name = "Alice", Age = 20, Grades = new List<int> { 90, 85, 88 } },
+    new Student { Name = "Bob", Age = 22, Grades = new List<int> { 75, 82, 81 } },
+    new Student { Name = "Charlie", Age = 19, Grades = new List<int> { 95, 92, 89 } }
+};
+
+// Query students
+var honorsStudents = students
+    .Where(s => s.Grades.Average() >= 85)
+    .OrderBy(s => s.Name);
+
+foreach (var student in honorsStudents)
+{
+    Console.WriteLine($"Honor Student: {student.Name}, Average Grade: {student.Grades.Average():F2}");
+}
+
+#!markdown
+
+### 6. Group By
+Group elements based on a key.
+
+#!csharp
+
+var studentsByAge = students
+    .GroupBy(s => s.Age)
+    .Select(g => new { Age = g.Key, Count = g.Count() });
+
+foreach (var group in studentsByAge)
+{
+    Console.WriteLine($"Age {group.Age}: {group.Count} student(s)");
+}
+
+#!markdown
+
+## Practice Exercises
+
+Try these exercises to reinforce your understanding:
+
+1. Filter a list of numbers to get only those divisible by 3
+2. Create a list of strings and sort them by length
+3. Find the average age of all students
+4. Group students by grade range (A: 90-100, B: 80-89, etc.)
+
+#!csharp
+
+// Exercise 1: Numbers divisible by 3
+var numbers2 = Enumerable.Range(1, 20);
+var divisibleBy3 = numbers2.Where(n => n % 3 == 0);
+Console.WriteLine("Numbers divisible by 3: " + string.Join(", ", divisibleBy3));
+
+// Exercise 2: Sort strings by length
+var words = new List<string> { "apple", "banana", "kiwi", "strawberry", "fig" };
+var sortedByLength = words.OrderBy(w => w.Length);
+Console.WriteLine("Sorted by length: " + string.Join(", ", sortedByLength));
+
+#!markdown
+
+## Common Mistakes to Avoid
+1. Don't execute LINQ queries unnecessarily (they are executed when enumerated)
+2. Be careful with null values (use FirstOrDefault instead of First when unsure)
+3. Remember that LINQ queries are case-sensitive by default
+4. Don't forget that LINQ operations return new sequences and don't modify the original
+
+#!markdown
+
+## Tips for Better LINQ Usage
+1. Use method chaining for complex queries
+2. Consider readability vs. complexity
+3. Use meaningful variable names in lambda expressions
+4. Break down complex queries into smaller parts
+5. Use appropriate LINQ methods based on your needs

@@ -1,0 +1,266 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":[],"name":"csharp"}]}}
+
+#!markdown
+
+# Other Important LINQ Methods
+This guide covers various useful LINQ methods that are commonly used in C# development.
+
+## Setting Up Sample Data
+
+#!csharp
+
+// Create sample data for our examples
+var numbers = new List<int> { 1, 2, 3, 4, 5, 2, 3, 4, 1, 5 };
+var words = new List<string> { "apple", "banana", "cherry", "date", "apple", "banana" };
+
+Console.WriteLine("Sample Numbers: " + string.Join(", ", numbers));
+Console.WriteLine("Sample Words: " + string.Join(", ", words));
+
+#!markdown
+
+## 1. Distinct
+Removes duplicate elements from a collection.
+
+#!csharp
+
+// Get unique numbers
+var uniqueNumbers = numbers.Distinct();
+Console.WriteLine("Unique Numbers: " + string.Join(", ", uniqueNumbers));
+
+// Get unique words
+var uniqueWords = words.Distinct();
+Console.WriteLine("Unique Words: " + string.Join(", ", uniqueWords));
+
+#!markdown
+
+## 2. Skip and Take
+`Skip()` bypasses a specified number of elements and `Take()` returns a specified number of elements.
+
+#!csharp
+
+// Take first 3 elements
+var firstThree = numbers.Take(3);
+Console.WriteLine("First 3 numbers: " + string.Join(", ", firstThree));
+
+// Skip first 3 elements and take next 2
+var skipAndTake = numbers.Skip(3).Take(2);
+Console.WriteLine("Skip 3, Take 2: " + string.Join(", ", skipAndTake));
+
+// TakeLast and SkipLast (available in newer versions)
+var lastThree = numbers.TakeLast(3);
+Console.WriteLine("Last 3 numbers: " + string.Join(", ", lastThree));
+
+var skipLast = numbers.SkipLast(3);
+Console.WriteLine("Skip last 3: " + string.Join(", ", skipLast));
+
+#!markdown
+
+## 3. Count, Sum, Average, Min, Max
+Aggregate functions for numerical operations.
+
+#!csharp
+
+// Create a list of products
+var products = new List<Product>
+{
+    new Product { Name = "Laptop", Price = 1200.00m },
+    new Product { Name = "Mouse", Price = 25.99m },
+    new Product { Name = "Keyboard", Price = 85.50m },
+    new Product { Name = "Monitor", Price = 350.00m }
+};
+
+Console.WriteLine($"Total number of products: {products.Count()}");
+Console.WriteLine($"Total price of all products: ${products.Sum(p => p.Price)}");
+Console.WriteLine($"Average price: ${products.Average(p => p.Price):F2}");
+Console.WriteLine($"Cheapest price: ${products.Min(p => p.Price)}");
+Console.WriteLine($"Most expensive price: ${products.Max(p => p.Price)}");
+
+#!markdown
+
+## 4. Single and SingleOrDefault
+Returns the only element in a sequence that satisfies a condition.
+
+#!csharp
+
+try
+{
+    // Get the only product priced over $1000
+    var expensiveProduct = products.Single(p => p.Price > 1000);
+    Console.WriteLine($"Expensive product: {expensiveProduct.Name}");
+    
+    // This will throw an exception if no matches or multiple matches
+    var nonExistentProduct = products.Single(p => p.Price > 2000);
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"Exception: {ex.Message}");
+}
+
+// Using SingleOrDefault instead
+var product = products.SingleOrDefault(p => p.Price > 2000);
+Console.WriteLine($"Product over $2000: {(product?.Name ?? "None found")}");
+
+#!markdown
+
+## 5. Contains and Except
+`Contains()` checks for element existence, and `Except()` returns the set difference.
+
+#!csharp
+
+var list1 = new List<int> { 1, 2, 3, 4, 5 };
+var list2 = new List<int> { 4, 5, 6, 7, 8 };
+
+// Check if list contains a number
+Console.WriteLine($"List1 contains 3: {list1.Contains(3)}");
+
+// Get elements in list1 that are not in list2
+var uniqueToList1 = list1.Except(list2);
+Console.WriteLine("Elements unique to list1: " + string.Join(", ", uniqueToList1));
+
+#!markdown
+
+## 6. Union, Intersect
+Set operations for collections.
+
+#!csharp
+
+// Union combines unique elements from both sequences
+var unionResult = list1.Union(list2);
+Console.WriteLine("Union of lists: " + string.Join(", ", unionResult));
+
+// Intersect finds common elements
+var intersectResult = list1.Intersect(list2);
+Console.WriteLine("Intersection of lists: " + string.Join(", ", intersectResult));
+
+#!markdown
+
+## 7. ElementAt and ElementAtOrDefault
+Retrieve element at a specific index.
+
+#!csharp
+
+try
+{
+    // Get element at index
+    var thirdElement = numbers.ElementAt(2);
+    Console.WriteLine($"Third element: {thirdElement}");
+    
+    // This will throw an exception
+    var nonExistentElement = numbers.ElementAt(20);
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"Exception: {ex.Message}");
+}
+
+// Using ElementAtOrDefault instead
+var safeElement = numbers.ElementAtOrDefault(20);
+Console.WriteLine($"20th element (or default): {safeElement}");
+
+#!markdown
+
+## 8. Aggregate
+Performs a custom accumulation operation on a sequence.
+
+#!csharp
+
+// Calculate product of all numbers
+var product = numbers.Aggregate((a, b) => a * b);
+Console.WriteLine($"Product of all numbers: {product}");
+
+// Create a comma-separated string
+var commaSeparated = words.Aggregate((current, next) => current + ", " + next);
+Console.WriteLine($"Comma separated words: {commaSeparated}");
+
+// Aggregate with seed value
+var shoppingList = words.Aggregate("Shopping List: ", (current, next) => current + next + ", ");
+Console.WriteLine(shoppingList.TrimEnd(',', ' '));
+
+#!markdown
+
+## 9. OfType
+Filters elements of a specific type from a collection.
+
+#!csharp
+
+// Create a mixed collection
+var mixedList = new List<object> { 1, "two", 3.0, "four", 5, true };
+
+// Get only strings
+var onlyStrings = mixedList.OfType<string>();
+Console.WriteLine("Only strings: " + string.Join(", ", onlyStrings));
+
+// Get only integers
+var onlyInts = mixedList.OfType<int>();
+Console.WriteLine("Only integers: " + string.Join(", ", onlyInts));
+
+#!markdown
+
+## 10. Chunk (Available in newer versions)
+Splits a collection into chunks of specified size.
+
+#!csharp
+
+// Split numbers into chunks of size 3
+var chunks = numbers.Chunk(3);
+foreach (var chunk in chunks)
+{
+    Console.WriteLine("Chunk: " + string.Join(", ", chunk));
+}
+
+#!markdown
+
+## Practice Exercises
+
+Try these exercises to reinforce your understanding:
+
+#!csharp
+
+// Sample data for exercises
+var students = new List<Student>
+{
+    new Student { Name = "Alice", Grades = new List<int> { 85, 90, 88, 92 } },
+    new Student { Name = "Bob", Grades = new List<int> { 75, 82, 81, 78 } },
+    new Student { Name = "Charlie", Grades = new List<int> { 95, 92, 89, 94 } }
+};
+
+// Exercise 1: Find the average grade for each student
+var studentAverages = students.Select(s => new 
+{ 
+    s.Name, 
+    AverageGrade = s.Grades.Average() 
+});
+
+foreach (var student in studentAverages)
+{
+    Console.WriteLine($"{student.Name}'s average grade: {student.AverageGrade:F2}");
+}
+
+// Exercise 2: Get unique grades across all students
+var uniqueGrades = students.SelectMany(s => s.Grades).Distinct().OrderBy(g => g);
+Console.WriteLine("All unique grades: " + string.Join(", ", uniqueGrades));
+
+#!markdown
+
+## Best Practices and Tips
+
+1. **Choose the Right Method**
+   - Use `SingleOrDefault()` over `Single()` when unsure about element existence
+   - Prefer `Any()` over `Count() > 0` for better performance
+   - Use `ElementAtOrDefault()` instead of `ElementAt()` when index might be out of range
+
+2. **Performance Considerations**
+   - Methods like `Count()`, `Sum()`, `Average()` enumerate the entire collection
+   - `Take()` and `Skip()` can be more efficient than substrings
+   - `Contains()` is more efficient than `Any(x => x == value)`
+
+3. **Null Handling**
+   - Always consider using the OrDefault variants when dealing with collections that might be empty
+   - Use null conditional operator (?.) when chaining LINQ methods on potentially null collections
+
+4. **Method Chaining**
+   - LINQ methods can be chained for complex operations
+   - Break long chains into multiple lines for readability
+   - Consider storing intermediate results for better debugging
